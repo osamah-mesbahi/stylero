@@ -1,0 +1,27 @@
+{
+  "name": "stylero",
+  "version": "1.0.0",
+  "description": "A lightweight CSS-in-JS styling library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "css",
+    "css-in-js",
+    "styling",
+    "styles",
+    "stylero"
+  ],
+  "author": "osamah-mesbahi",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "files": [
+    "dist"
+  ]
+}

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stylero Example</title>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script type="module">
+    // This is a demo showing how Stylero would work in a browser
+    // In a real project, you'd import from the npm package
+    
+    // Inline the core functionality for demo purposes
+    let classCounter = 0;
+    function generateClassName(prefix = 'stylero') {
+      return `${prefix}-${++classCounter}`;
+    }
+
+    function styleObjectToCSS(styles, selector) {
+      let css = '';
+      let nestedCSS = '';
+      const declarations = [];
+
+      for (const [key, value] of Object.entries(styles)) {
+        if (typeof value === 'object') {
+          const nestedSelector = key.startsWith('&') 
+            ? key.replace('&', selector) 
+            : `${selector} ${key}`;
+          nestedCSS += styleObjectToCSS(value, nestedSelector);
+        } else {
+          const cssProperty = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+          declarations.push(`  ${cssProperty}: ${value};`);
+        }
+      }
+
+      if (declarations.length > 0) {
+        css = `${selector} {\n${declarations.join('\n')}\n}\n`;
+      }
+
+      return css + nestedCSS;
+    }
+
+    function injectStyles(css) {
+      const styleElement = document.createElement('style');
+      styleElement.textContent = css;
+      document.head.appendChild(styleElement);
+    }
+
+    function css(styles) {
+      const className = generateClassName();
+      const cssString = styleObjectToCSS(styles, `.${className}`);
+      injectStyles(cssString);
+      return className;
+    }
+
+    function createStyles(styles) {
+      const classNames = {};
+      let cssText = '';
+
+      for (const [name, styleObj] of Object.entries(styles)) {
+        const className = generateClassName();
+        classNames[name] = className;
+        cssText += styleObjectToCSS(styleObj, `.${className}`);
+      }
+
+      injectStyles(cssText);
+      return classNames;
+    }
+
+    // Create styles using Stylero
+    const styles = createStyles({
+      container: {
+        maxWidth: '800px',
+        margin: '50px auto',
+        padding: '20px',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+      },
+      title: {
+        fontSize: '32px',
+        fontWeight: 'bold',
+        color: '#2c3e50',
+        marginBottom: '20px',
+        textAlign: 'center',
+      },
+      card: {
+        backgroundColor: '#f8f9fa',
+        padding: '24px',
+        borderRadius: '8px',
+        marginBottom: '16px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      },
+      button: {
+        backgroundColor: '#007bff',
+        color: 'white',
+        padding: '12px 24px',
+        border: 'none',
+        borderRadius: '4px',
+        fontSize: '16px',
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+        '&:hover': {
+          backgroundColor: '#0056b3',
+          transform: 'translateY(-2px)',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+        },
+        '&:active': {
+          transform: 'translateY(0)',
+        },
+      },
+      description: {
+        color: '#666',
+        lineHeight: '1.6',
+        marginBottom: '20px',
+      },
+    });
+
+    // Create the UI
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="${styles.container}">
+        <h1 class="${styles.title}">🎨 Stylero Example</h1>
+        
+        <div class="${styles.card}">
+          <h2>Welcome to Stylero!</h2>
+          <p class="${styles.description}">
+            Stylero is a lightweight CSS-in-JS library that makes styling easy and type-safe.
+            This example demonstrates how you can create beautiful, dynamic styles with JavaScript.
+          </p>
+          <button class="${styles.button}">Try Hovering Me!</button>
+        </div>
+        
+        <div class="${styles.card}">
+          <h2>Features</h2>
+          <p class="${styles.description}">
+            ✨ Zero dependencies<br>
+            💪 TypeScript support<br>
+            🚀 Lightweight and fast<br>
+            🎯 Simple API
+          </p>
+        </div>
+      </div>
+    `;
+
+    // Add click handler
+    document.querySelector('button').addEventListener('click', () => {
+      alert('Stylero makes styling fun! 🎉');
+    });
+  </script>
+</body>
+</html>
